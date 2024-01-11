@@ -1,6 +1,7 @@
 package com.refactor.practice;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,31 +12,36 @@ import java.util.Vector;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomerTest {
-	private Customer customer;
-	private String baseline;
+  @org.junit.Test
+  public void testStatement() {
 
-	@Before
-	public void setUp() throws IOException {
-		customer = new Customer("user1", new Vector());
-		File file = new File("src/test/java/com/refactor/practice/baseline");
-		baseline = FileUtils.readFileToString(file);
-	}
+    Movie movie1 = new Movie("电影1", Movie.NEW_RELEASE);
+    Movie movie2 = new Movie("电影2", Movie.CHILDRENS);
+    Movie movie3 = new Movie("电影3", Movie.REGULAR);
 
-	@Test
-	public void should_get_statement_of_rentals() {
-		//given
-		addRental(customer, "regular movie", Movie.REGULAR, 3);
-		addRental(customer, "new movie", Movie.NEW_RELEASE, 2);
-		addRental(customer, "children movie", Movie.CHILDRENS, 5);
-		//when
-		String result = customer.statement();
-		//then
-		assertThat(result).isEqualTo(baseline);
-	}
 
-	private void addRental(Customer customer, String movieTitle, int movieType, int dayRented) {
-		Movie movie = new Movie(movieTitle, movieType);
-		Rental rental = new Rental(movie, dayRented);
-		customer.addRental(rental);
-	}
+    Customer customer1 = new Customer("客户1");
+    Customer customer2 = new Customer("客户2");
+
+    //顾客租约
+    Rental rental1 = new Rental(movie1, 10);
+    Rental rental2 = new Rental(movie2, 1);
+    Rental rental3 = new Rental(movie3, 3);
+    customer1.addRental(rental1);
+    customer1.addRental(rental2);
+    customer2.addRental(rental2);
+    customer2.addRental(rental3);
+
+    Assert.assertEquals(customer1.statement(), "Rental Records for 客户1\n" +
+        "\t电影1\t30.0\n" +
+        "\t电影2\t1.5\n" +
+        "Amount owed is 31.5\n" +
+        "You earned 3 frequent renter points");
+    Assert.assertEquals(customer2.statement(), "Rental Records for 客户2\n" +
+        "\t电影2\t1.5\n" +
+        "\t电影3\t3.5\n" +
+        "Amount owed is 5.0\n" +
+        "You earned 2 frequent renter points");
+  }
+
 }
